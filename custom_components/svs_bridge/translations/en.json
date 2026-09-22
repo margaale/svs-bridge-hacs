@@ -57,6 +57,11 @@
       "svs_connected": {
         "name": "SVS connected"
       }
+    },
+    "update": {
+      "firmware": {
+        "name": "Firmware"
+      }
     }
   }
 }
