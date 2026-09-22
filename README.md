@@ -15,6 +15,7 @@ Once set up, the bridge appears as a single device with:
 | Entity | Type | Notes |
 | --- | --- | --- |
 | **Active input** | sensor | The SVS's current input number (`unknown` when no input is active). |
+| **Firmware** | update | The bridge's running firmware, and whether a newer GitHub release exists. Notify-only; install from the bridge's web UI. |
 | **SVS connected** | binary sensor | Whether the SVS is reachable over the bridge's USB link. |
 | **SVS firmware** | sensor (diagnostic) | The SVS firmware version reported in its banner. |
 | **Total inputs** | sensor (diagnostic, disabled by default) | How many inputs the SVS has. |
