@@ -20,3 +20,11 @@ UPDATE_INTERVAL = timedelta(seconds=3)
 
 # Zeroconf service the firmware advertises (see wifi_manager.cpp).
 ZEROCONF_TYPE = "_svsbridge._tcp.local."
+
+# The firmware's GitHub repository, used to detect a newer bridge release.
+GITHUB_REPO = "margaale/svs-bridge"
+GITHUB_LATEST_RELEASE_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+
+# How often to check GitHub for a newer firmware release (GitHub allows 60
+# unauthenticated calls per hour; this stays well within that).
+LATEST_CHECK_INTERVAL = timedelta(minutes=30)

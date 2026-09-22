@@ -12,7 +12,7 @@ from .api import SvsBridgeAuthError, SvsBridgeClient, SvsBridgeError
 from .const import CONF_HOST, CONF_TOKEN
 from .coordinator import SvsBridgeCoordinator
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.UPDATE]
 
 SvsBridgeConfigEntry = ConfigEntry[SvsBridgeCoordinator]
 
