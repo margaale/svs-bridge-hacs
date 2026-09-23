@@ -35,6 +35,15 @@ class SvsBridgeUpdate(SvsBridgeEntity, UpdateEntity):
         super().__init__(coordinator, "firmware_update")
 
     @property
+    def entity_picture(self) -> str | None:
+        # Update entities default to the integration's brand image as their
+        # picture, which takes precedence over the icon. This custom integration
+        # is not in home-assistant/brands, so that image 404s and Home Assistant
+        # shows an "icon not available" placeholder. Drop it so the mdi icon
+        # from icons.json is used instead.
+        return None
+
+    @property
     def installed_version(self) -> str | None:
         # The polled version; fall back to what was read at setup.
         return self._bridge.get("sw_version") or self.coordinator.info.get("sw_version")
