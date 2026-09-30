@@ -51,6 +51,13 @@
       },
       "rssi": {
         "name": "Signal strength"
+      },
+      "updates": {
+        "name": "Updates",
+        "state": {
+          "push": "Push",
+          "polling": "Polling"
+        }
       }
     },
     "binary_sensor": {

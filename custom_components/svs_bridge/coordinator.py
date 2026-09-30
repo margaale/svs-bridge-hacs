@@ -10,7 +10,7 @@ from typing import Any
 import aiohttp
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -57,6 +57,8 @@ class SvsBridgeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._latest_checked: datetime | None = None
         self._github = async_get_clientsession(hass)  # verified TLS for github.com
         self._device_version: str | None = None
+        # Whether the bridge pushes the state (/api/v1/events), or it's polled (the "Updates" sensor).
+        self.pushing = False
 
     async def _async_update_data(self) -> dict[str, Any]:
         try:
@@ -70,6 +72,14 @@ class SvsBridgeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._update_device_version(data)
         await self._maybe_check_latest()
         return data
+
+    @callback
+    def _set_pushing(self, pushing: bool) -> None:
+        """Events flowing or not: polling slows to a safety net or speeds up, and "Updates" says so."""
+        self.update_interval = PUSH_UPDATE_INTERVAL if pushing else UPDATE_INTERVAL
+        if pushing != self.pushing:
+            self.pushing = pushing
+            self.async_update_listeners()
 
     async def async_listen(self) -> None:
         """Keep the bridge's events socket open for as long as the entry is loaded.
@@ -85,15 +95,14 @@ class SvsBridgeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 async for event in self.client.async_events("state"):
                     kind = event.get("type")
                     if kind == "hello":
-                        if "state" in event.get("subscribed", []):
-                            self.update_interval = PUSH_UPDATE_INTERVAL
+                        self._set_pushing("state" in event.get("subscribed", []))
                         delay = RECONNECT_MIN_S
                     elif kind == "state" and isinstance(event.get("state"), dict):
                         self._update_device_version(event["state"])
                         self.async_set_updated_data(event["state"])
                     # Other types (a later bridge's) only come to sockets that ask for them.
             except SvsBridgeAuthError:
-                self.update_interval = UPDATE_INTERVAL
+                self._set_pushing(False)
                 self.config_entry.async_start_reauth(self.hass)
                 return
             except SvsBridgeUnsupportedError:
@@ -101,7 +110,7 @@ class SvsBridgeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 return
             except SvsBridgeError as err:
                 _LOGGER.debug("The bridge's events socket: %s", err)
-            self.update_interval = UPDATE_INTERVAL
+            self._set_pushing(False)
             await asyncio.sleep(delay)
             delay = min(delay * 2, RECONNECT_MAX_S)
 
