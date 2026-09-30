@@ -25,7 +25,7 @@ def active_input(hass: HomeAssistant) -> str:
 
 
 async def test_setup_polls(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
-    """A bridge from before /api/v1/events (404): polled every 3 s, as before."""
+    """A bridge from before /api/v1/events (404): polled every 10 s."""
     mock_bridge(aioclient_mock)
     entry = await setup_bridge(hass)
     await settle(hass)
