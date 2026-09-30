@@ -19,9 +19,18 @@ from .conftest import BRIDGE_ID, mock_bridge, settle, setup_bridge, state_with
 HELLO = {"type": "hello", "api_version": 1, "types": ["state"], "subscribed": ["state"]}
 
 
-def active_input(hass: HomeAssistant) -> str:
-    entity_id = er.async_get(hass).async_get_entity_id("sensor", DOMAIN, f"{BRIDGE_ID}_active_input")
+def sensor(hass: HomeAssistant, key: str) -> str:
+    entity_id = er.async_get(hass).async_get_entity_id("sensor", DOMAIN, f"{BRIDGE_ID}_{key}")
     return hass.states.get(entity_id).state
+
+
+def active_input(hass: HomeAssistant) -> str:
+    return sensor(hass, "active_input")
+
+
+def updates(hass: HomeAssistant) -> str:
+    """The "Updates" diagnostic sensor: push or polling."""
+    return sensor(hass, "updates")
 
 
 async def test_setup_polls(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
@@ -32,6 +41,7 @@ async def test_setup_polls(hass: HomeAssistant, aioclient_mock: AiohttpClientMoc
     assert entry.state is ConfigEntryState.LOADED
     assert entry.runtime_data.update_interval == UPDATE_INTERVAL
     assert active_input(hass) == "2"
+    assert updates(hass) == "polling"
 
 
 async def test_pushed_state(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, events: asyncio.Queue) -> None:
@@ -43,6 +53,7 @@ async def test_pushed_state(hass: HomeAssistant, aioclient_mock: AiohttpClientMo
     await settle(hass)
     assert active_input(hass) == "5"
     assert entry.runtime_data.update_interval == PUSH_UPDATE_INTERVAL
+    assert updates(hass) == "push"
 
     # A type a later bridge could send (to sockets that ask for it) changes nothing.
     events.put_nowait({"type": "later", "anything": [1, 2]})
@@ -61,16 +72,19 @@ async def test_socket_breaks_and_reconnects(
     events.put_nowait(HELLO)
     await settle(hass)
     assert coordinator.update_interval == PUSH_UPDATE_INTERVAL
+    assert updates(hass) == "push"  # the hello alone says so, before any state
 
     events.put_nowait(SvsBridgeError("The bridge restarted"))
     await settle(hass)
     assert coordinator.update_interval == UPDATE_INTERVAL
+    assert updates(hass) == "polling"
 
     events.put_nowait(HELLO)
     events.put_nowait({"type": "state", "state": state_with(svs={"current_input": 7})})
     await settle(hass)
     assert coordinator.update_interval == PUSH_UPDATE_INTERVAL
     assert active_input(hass) == "7"
+    assert updates(hass) == "push"
 
     events.put_nowait(None)  # the bridge closed it: poll until it's back
     await settle(hass)
@@ -86,6 +100,7 @@ async def test_hello_without_state(
     events.put_nowait({"type": "hello", "api_version": 1, "types": [], "subscribed": []})
     await settle(hass)
     assert entry.runtime_data.update_interval == UPDATE_INTERVAL
+    assert updates(hass) == "polling"
 
 
 async def test_token_regenerated(
@@ -102,6 +117,7 @@ async def test_token_regenerated(
     assert len(flows) == 1
     assert flows[0]["context"]["entry_id"] == entry.entry_id
     assert entry.runtime_data.update_interval == UPDATE_INTERVAL
+    assert updates(hass) == "polling"
     events.put_nowait({"type": "state", "state": state_with(svs={"current_input": 4})})
     await settle(hass)
     assert events.qsize() == 1  # nobody took it: the listener stopped

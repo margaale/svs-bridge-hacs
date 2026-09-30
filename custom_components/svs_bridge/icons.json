@@ -4,6 +4,14 @@
       "firmware": {
         "default": "mdi:chip"
       }
+    },
+    "sensor": {
+      "updates": {
+        "default": "mdi:timer-sync-outline",
+        "state": {
+          "push": "mdi:access-point"
+        }
+      }
     }
   }
 }

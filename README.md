@@ -20,6 +20,7 @@ Once set up, the bridge appears as a single device with:
 | **Firmware** | update | The bridge's running firmware, and whether a newer GitHub release exists. Notify-only; install from the bridge's web UI. |
 | **SVS connected** | binary sensor | Whether the SVS is reachable over the bridge's USB link. |
 | **SVS firmware** | sensor (diagnostic) | The SVS firmware version reported in its banner. |
+| **Updates** | sensor (diagnostic) | `Push` while the bridge pushes its state (instant), `Polling` otherwise (every 10 s: a bridge from before events, or its socket down). |
 | **Total inputs** | sensor (diagnostic, disabled by default) | How many inputs the SVS has. |
 | **Signal strength** | sensor (diagnostic, disabled by default) | The bridge's WiFi RSSI. |
 

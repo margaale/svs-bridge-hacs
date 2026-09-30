@@ -71,7 +71,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up the SVS Bridge sensors."""
     coordinator = entry.runtime_data
-    async_add_entities(SvsBridgeSensor(coordinator, desc) for desc in SENSORS)
+    async_add_entities([*(SvsBridgeSensor(coordinator, desc) for desc in SENSORS), UpdatesSensor(coordinator)])
 
 
 class SvsBridgeSensor(SvsBridgeEntity, SensorEntity):
@@ -86,3 +86,20 @@ class SvsBridgeSensor(SvsBridgeEntity, SensorEntity):
     @property
     def native_value(self) -> Any:
         return self.entity_description.value_fn(self._svs, self._bridge)
+
+
+class UpdatesSensor(SvsBridgeEntity, SensorEntity):
+    """How the state reaches Home Assistant: "push" while the bridge's /api/v1/events flows,
+    "polling" otherwise (a bridge from before events, or its socket down)."""
+
+    _attr_translation_key = "updates"
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = ["push", "polling"]
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    def __init__(self, coordinator) -> None:
+        super().__init__(coordinator, "updates")
+
+    @property
+    def native_value(self) -> str:
+        return "push" if self.coordinator.pushing else "polling"
