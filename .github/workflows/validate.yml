@@ -26,12 +26,14 @@ jobs:
           # This is a custom integration, not (yet) in home-assistant/brands.
           ignore: brands
 
-  syntax:
-    name: Python syntax
+  # Home Assistant itself, with the bridge's API mocked as its README describes (tests/conftest.py).
+  tests:
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
-      - run: python -m compileall -q custom_components
+      - run: pip install -r requirements_test.txt
+      - run: pytest -q
