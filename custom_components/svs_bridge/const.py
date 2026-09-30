@@ -14,10 +14,10 @@ CONF_TOKEN = "token"
 DEFAULT_PORT = 443
 
 # How often the coordinator polls the bridge without events (a bridge from before
-# /api/v1/events, or while its socket is down). The SVS reports input changes
-# almost immediately over serial; a few seconds of latency is fine for turning
-# a TV or scaler on, and keeps the little ESP32 lightly loaded.
-UPDATE_INTERVAL = timedelta(seconds=3)
+# /api/v1/events, or while its socket is down). Events bring an input change at
+# once; 10 s (as Cruller's integration) keeps the ESP32's TLS load light meanwhile,
+# and makes it plain when events aren't flowing.
+UPDATE_INTERVAL = timedelta(seconds=10)
 
 # While /api/v1/events pushes the state, polling is only a safety net.
 PUSH_UPDATE_INTERVAL = timedelta(seconds=60)

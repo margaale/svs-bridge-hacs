@@ -7,7 +7,8 @@ for example, turn on a TV or a RetroTINK when the active input switches.
 
 The integration is **local push**: the bridge tells Home Assistant as soon as the
 active input changes (its `/api/v1/events`), over your LAN, with no cloud and no
-MQTT. With a bridge from before events, it polls every 3 s instead.
+MQTT. With a bridge from before events (firmware 0.2.0 or older), it polls every
+10 s instead: update the bridge to 0.2.1 or later for instant changes.
 
 ## Entities
 
@@ -19,6 +20,7 @@ Once set up, the bridge appears as a single device with:
 | **Firmware** | update | The bridge's running firmware, and whether a newer GitHub release exists. Notify-only; install from the bridge's web UI. |
 | **SVS connected** | binary sensor | Whether the SVS is reachable over the bridge's USB link. |
 | **SVS firmware** | sensor (diagnostic) | The SVS firmware version reported in its banner. |
+| **Updates** | sensor (diagnostic) | `Push` while the bridge pushes its state (instant), `Polling` otherwise (every 10 s: a bridge from before events, or its socket down). |
 | **Total inputs** | sensor (diagnostic, disabled by default) | How many inputs the SVS has. |
 | **Signal strength** | sensor (diagnostic, disabled by default) | The bridge's WiFi RSSI. |
 
