@@ -5,8 +5,9 @@ A custom [Home Assistant](https://www.home-assistant.io/) integration for the
 USB and exposes its state on your network. Use it to react to input changes —
 for example, turn on a TV or a RetroTINK when the active input switches.
 
-The integration is **local polling** only: it talks to the bridge over your LAN,
-with no cloud and no MQTT.
+The integration is **local push**: the bridge tells Home Assistant as soon as the
+active input changes (its `/api/v1/events`), over your LAN, with no cloud and no
+MQTT. With a bridge from before events, it polls every 3 s instead.
 
 ## Entities
 
