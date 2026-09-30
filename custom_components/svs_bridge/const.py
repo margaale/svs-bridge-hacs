@@ -13,10 +13,19 @@ CONF_TOKEN = "token"
 # The bridge serves its API over HTTPS on 443 with a self-signed certificate.
 DEFAULT_PORT = 443
 
-# How often the coordinator polls the bridge. The SVS reports input changes
+# How often the coordinator polls the bridge without events (a bridge from before
+# /api/v1/events, or while its socket is down). The SVS reports input changes
 # almost immediately over serial; a few seconds of latency is fine for turning
 # a TV or scaler on, and keeps the little ESP32 lightly loaded.
 UPDATE_INTERVAL = timedelta(seconds=3)
+
+# While /api/v1/events pushes the state, polling is only a safety net.
+PUSH_UPDATE_INTERVAL = timedelta(seconds=60)
+
+# The events socket: reconnect after this many seconds, doubling up to the most
+# while it keeps failing.
+RECONNECT_MIN_S = 5
+RECONNECT_MAX_S = 60
 
 # Zeroconf service the firmware advertises (see wifi_manager.cpp).
 ZEROCONF_TYPE = "_svsbridge._tcp.local."
