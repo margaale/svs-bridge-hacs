@@ -33,7 +33,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class SvsBridgeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Shares the bridge's /api/v1/state with entities: pushed over /api/v1/events as it changes,
-    polled as a safety net (or every 3 s with a bridge from before events)."""
+    polled as a safety net (or every 10 s with a bridge from before events)."""
 
     def __init__(
         self,

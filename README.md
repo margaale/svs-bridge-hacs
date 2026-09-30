@@ -7,7 +7,8 @@ for example, turn on a TV or a RetroTINK when the active input switches.
 
 The integration is **local push**: the bridge tells Home Assistant as soon as the
 active input changes (its `/api/v1/events`), over your LAN, with no cloud and no
-MQTT. With a bridge from before events, it polls every 3 s instead.
+MQTT. With a bridge from before events (firmware 0.2.0 or older), it polls every
+10 s instead: update the bridge to 0.2.1 or later for instant changes.
 
 ## Entities
 
