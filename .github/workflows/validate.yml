@@ -26,6 +26,17 @@ jobs:
           # This is a custom integration, not (yet) in home-assistant/brands.
           ignore: brands
 
+  # A required check on develop and master (branch protection): keep its name.
+  syntax:
+    name: Python syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: python -m compileall -q custom_components
+
   # Home Assistant itself, with the bridge's API mocked as its README describes (tests/conftest.py).
   tests:
     name: Tests
