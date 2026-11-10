@@ -120,9 +120,11 @@ class SvsBridgeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if not version or version == self._device_version:
             return
         self._device_version = version
-        device = dr.async_get(self.hass).async_get_device(identifiers={(DOMAIN, self.info["id"])})
+        registry = dr.async_get(self.hass)
+        # Identifiers are unique per config entry only: the device is looked up in this one.
+        device = registry.async_get_device_by_identifier((DOMAIN, self.info["id"]), self.config_entry.entry_id)
         if device is not None:
-            dr.async_get(self.hass).async_update_device(device.id, sw_version=version)
+            registry.async_update_device(device.id, sw_version=version)
 
     async def _maybe_check_latest(self) -> None:
         """Check GitHub for a newer firmware release, at most every 30 minutes."""
